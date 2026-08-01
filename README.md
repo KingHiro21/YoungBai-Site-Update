@@ -1,0 +1,51 @@
+# Youngbai — Dota 2 Boosting & Gaming Community
+
+React + Vite site. Everything editable lives in **one file**: `src/config.js`.
+
+## Run locally
+```bash
+npm install
+npm run dev
+```
+
+## Deploy on Vercel
+Push this repo to GitHub, import it in Vercel — it auto-detects Vite.
+(Build command `npm run build`, output directory `dist`. No config needed.)
+
+## Edit your content — all in `src/config.js`
+| What | Where |
+|---|---|
+| YouTube / Facebook / Discord links | `SITE_CONFIG.socialLinks` |
+| Solo pricing (per 100 MMR) | `SOLO_PRICING` |
+| Party pricing (per win) | `PARTY_PRICING` |
+| Order add-ons + percentages | `BOOST_ADDONS` (set `[]` to hide) |
+| Payment methods strip | `PAYMENT_METHODS` |
+| Server / queue dropdowns | `ORDER_OPTIONS` |
+| "Youngbai Shield" trust points | `SHIELD_POINTS` |
+| Rank medals + MMR thresholds | `RANKS` (see below) |
+| Service tabs (incl. "Soon" ones) | `SERVICE_TABS` |
+| Stats, testimonials, FAQ, leaderboard | `COMMUNITY_STATS`, `TESTIMONIALS`, `FAQ_ITEMS`, `LEADERBOARD` |
+
+The calculator reads `SOLO_PRICING` / `PARTY_PRICING` directly —
+update a price once and the tables, cards, and estimates all follow.
+
+## Rank medal images
+Drop your 8 medal PNGs into `public/ranks/` and set the paths in
+`RANKS` in `src/config.js`:
+
+```js
+{ name: "Herald", minMmr: 0, color: "#7d8a93", img: "/ranks/herald.png" },
+```
+
+While `img` is empty (or a file is missing) tiles show a colored gem
+fallback — the site never shows a broken image.
+
+## Structure
+```
+src/
+  config.js        ← edit this one
+  styles.css       ← full design system
+  shared.jsx       ← Reveal, Embers, RankBadge, SocialLinks
+  App.jsx
+  components/      ← one file per section (Navbar … Footer)
+```
