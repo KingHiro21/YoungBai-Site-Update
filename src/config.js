@@ -18,9 +18,7 @@ export const SITE_CONFIG = {
       "Youngbai provides Dota 2 Solo and Party MMR boosting, plus tournaments, giveaways, prizes and a gaming community on Discord.",
   },
   socialLinks: {
-    youtube: "YOUTUBE_URL",
-    facebook: "FACEBOOK_URL",
-    discord: "DISCORD_URL",
+    discord: "https://discord.gg/thaDTdX9mT",
   },
   currency: "₱",
   mmrPerWin: 25, // used for the approx. per-win estimates + calculator
@@ -82,6 +80,27 @@ export const SERVICE_TABS = [
   { id: "calibration", label: "Calibration", icon: "crosshair", soon: true },
   { id: "lowprio", label: "Low Priority", icon: "lock", soon: true },
   { id: "coaching", label: "Coaching", icon: "graduation", soon: true },
+];
+
+/* Social channels. Icon keys: facebook, instagram, tiktok, whatsapp,
+   wechat, discord. Entries with an href render as links; entries with
+   only "info" (like WeChat, which has no public profile URL) render as
+   a hoverable badge showing the ID. Add/remove lines freely. */
+export const SOCIALS = [
+  { id: "fb-main", label: "Main Facebook", icon: "facebook",
+    href: "https://facebook.com/legsharthart" },
+  { id: "fb-page", label: "Facebook Page", icon: "facebook",
+    href: "https://facebook.com/ashdotes22" },
+  { id: "tiktok", label: "TikTok", icon: "tiktok",
+    href: "https://www.tiktok.com/@youngbaidota" },
+  { id: "instagram", label: "Instagram", icon: "instagram",
+    href: "https://www.instagram.com/ybdotes/" },
+  { id: "whatsapp", label: "WhatsApp", icon: "whatsapp",
+    href: "https://wa.me/639122900598" },
+  { id: "wechat", label: "WeChat", icon: "wechat",
+    info: "Youngbai · 0912 290 0598" },
+  { id: "discord", label: "Discord", icon: "discord",
+    href: "https://discord.gg/thaDTdX9mT" },
 ];
 
 export const rankForMmr = (mmr) =>

@@ -110,6 +110,8 @@
   transition:all .22s ease; }
 .yb-soc:hover { color:var(--bone); border-color:var(--crimson); transform:translateY(-2px);
   box-shadow:0 6px 20px rgba(196,18,48,.28); }
+.yb-soc.is-static { cursor:help; }
+.yb-soc.is-static:hover { border-color:var(--gold-dim); box-shadow:none; }
 
 /* ── hero ─────────────────────────────────────────── */
 .yb-hero { min-height:100svh; display:flex; align-items:center;

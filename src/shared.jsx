@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Youtube, Facebook, MessageSquare, Target, Users, Crosshair, Lock, GraduationCap } from "lucide-react";
-import { SITE_CONFIG } from "./config.js";
+import {
+  Facebook, Instagram, Music2, Phone, MessageCircle, MessageSquare,
+  Target, Users, Crosshair, Lock, GraduationCap,
+} from "lucide-react";
+import { SITE_CONFIG, SOCIALS } from "./config.js";
 
 export function useReveal() {
   const ref = useRef(null);
@@ -145,21 +148,32 @@ export function RankBadge({ rank, size = 30 }) {
   return <span className="yb-gem" style={{ "--tier": rank.color }} aria-hidden="true" />;
 }
 
+const SOCIAL_ICONS = {
+  facebook: Facebook,
+  instagram: Instagram,
+  tiktok: Music2,       // lucide has no brand glyph; musical note reads as TikTok
+  whatsapp: Phone,
+  wechat: MessageCircle,
+  discord: MessageSquare,
+};
+
 export function SocialLinks({ size = 18 }) {
-  const { youtube, facebook, discord } = SITE_CONFIG.socialLinks;
-  const items = [
-    { href: youtube, icon: Youtube, label: "Youngbai on YouTube" },
-    { href: facebook, icon: Facebook, label: "Youngbai on Facebook" },
-    { href: discord, icon: MessageSquare, label: "Youngbai Discord" },
-  ];
   return (
     <div className="yb-socials">
-      {items.map(({ href, icon: Icon, label }) => (
-        <a key={label} href={href} className="yb-soc" aria-label={label}
-           target="_blank" rel="noreferrer noopener">
-          <Icon size={size} strokeWidth={1.7} />
-        </a>
-      ))}
+      {SOCIALS.map((s) => {
+        const Icon = SOCIAL_ICONS[s.icon] || MessageSquare;
+        const title = s.info ? s.label + ": " + s.info : "Youngbai on " + s.label;
+        return s.href ? (
+          <a key={s.id} href={s.href} className="yb-soc" aria-label={title}
+             title={title} target="_blank" rel="noreferrer noopener">
+            <Icon size={size} strokeWidth={1.7} />
+          </a>
+        ) : (
+          <span key={s.id} className="yb-soc is-static" aria-label={title} title={title}>
+            <Icon size={size} strokeWidth={1.7} />
+          </span>
+        );
+      })}
     </div>
   );
 }
