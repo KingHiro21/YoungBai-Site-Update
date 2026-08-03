@@ -1,9 +1,8 @@
 import React from "react";
-import { SITE_CONFIG, NAV_LINKS } from "../config.js";
+import { SITE_CONFIG, NAV_LINKS, SOCIALS } from "../config.js";
 import { SocialLinks } from "../shared.jsx";
 
 export default function Footer() {
-  const { youtube, facebook, discord } = SITE_CONFIG.socialLinks;
   return (
     <footer className="yb-foot">
       <div className="yb-wrap">
@@ -24,9 +23,17 @@ export default function Footer() {
           <div>
             <h4>Follow</h4>
             <div className="yb-foot-links">
-              <a href={youtube} target="_blank" rel="noreferrer noopener">YouTube</a>
-              <a href={facebook} target="_blank" rel="noreferrer noopener">Facebook</a>
-              <a href={discord} target="_blank" rel="noreferrer noopener">Discord</a>
+              {SOCIALS.map((s) =>
+                s.href ? (
+                  <a key={s.id} href={s.href} target="_blank" rel="noreferrer noopener">
+                    {s.label}
+                  </a>
+                ) : (
+                  <span key={s.id} style={{ color: "var(--ash)" }}>
+                    {s.label}: {s.info}
+                  </span>
+                )
+              )}
             </div>
           </div>
         </div>
