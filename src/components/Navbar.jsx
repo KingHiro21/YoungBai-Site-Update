@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X, MessageSquare } from "lucide-react";
 import { SITE_CONFIG, NAV_LINKS } from "../config.js";
 import { SocialLinks } from "../shared.jsx";
+
+/* Hash links must become "/#section" when we're not on the home page. */
+function NavA({ href, children, className, onClick }) {
+  const { pathname } = useLocation();
+  if (href.startsWith("#")) {
+    const target = pathname === "/" ? href : "/" + href;
+    return <a href={target} className={className} onClick={onClick}>{children}</a>;
+  }
+  return <Link to={href} className={className} onClick={onClick}>{children}</Link>;
+}
 
 export default function Navbar() {
   const [stuck, setStuck] = useState(false);
@@ -21,9 +32,9 @@ export default function Navbar() {
   }, []);
 
   const logo = (
-    <a href="#home" className="yb-logo" onClick={() => setOpen(false)}>
+    <NavA href="#home" className="yb-logo" onClick={() => setOpen(false)}>
       YOUNGBA<i>I</i>
-    </a>
+    </NavA>
   );
 
   return (
@@ -33,7 +44,7 @@ export default function Navbar() {
           {logo}
           <nav className="yb-navlinks" aria-label="Main">
             {NAV_LINKS.map((l) => (
-              <a key={l.href} href={l.href}>{l.label}</a>
+              <NavA key={l.href} href={l.href}>{l.label}</NavA>
             ))}
           </nav>
           <div className="yb-nav-cta">
@@ -41,7 +52,7 @@ export default function Navbar() {
                className="yb-btn yb-btn-ghost yb-btn-sm">
               <MessageSquare size={15} /> Discord
             </a>
-            <a href="#solo" className="yb-btn yb-btn-primary yb-btn-sm">Order boost</a>
+            <NavA href="#solo" className="yb-btn yb-btn-primary yb-btn-sm">Order boost</NavA>
           </div>
           <button className="yb-burger" onClick={() => setOpen(true)}
                   aria-label="Open menu" aria-expanded={open}>
@@ -59,10 +70,9 @@ export default function Navbar() {
         </div>
         <nav aria-label="Mobile">
           {NAV_LINKS.map((l, i) => (
-            <a key={l.href} href={l.href} onClick={() => setOpen(false)}
-               style={{ animationDelay: 40 + i * 45 + "ms" }}>
-              {l.label}
-            </a>
+            <span key={l.href} style={{ animationDelay: 40 + i * 45 + "ms", display: "contents" }}>
+              <NavA href={l.href} onClick={() => setOpen(false)}>{l.label}</NavA>
+            </span>
           ))}
         </nav>
         <div className="yb-drawer-foot">
@@ -70,10 +80,10 @@ export default function Navbar() {
              className="yb-btn yb-btn-ghost yb-btn-block">
             <MessageSquare size={17} /> Join Discord
           </a>
-          <a href="#solo" onClick={() => setOpen(false)}
-             className="yb-btn yb-btn-primary yb-btn-block">
+          <NavA href="#solo" onClick={() => setOpen(false)}
+                className="yb-btn yb-btn-primary yb-btn-block">
             Order boost
-          </a>
+          </NavA>
           <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}>
             <SocialLinks />
           </div>

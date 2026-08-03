@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { MessageSquare, Zap, ShieldCheck, Target, TrendingUp, ChevronDown, Lock } from "lucide-react";
 import { SITE_CONFIG, SOLO_PRICING, PARTY_PRICING, BOOST_ADDONS, ORDER_OPTIONS, SHIELD_POINTS, RANKS, SERVICE_TABS, rankForMmr, peso } from "../config.js";
 import { Reveal, SectionHead, TAB_ICONS, RankBadge } from "../shared.jsx";
@@ -245,10 +246,11 @@ export default function ClimbCalculator() {
                   </div>
                 </div>
 
-                <a href="#payment"
-                   className={"yb-btn yb-btn-block " + (mode === "solo" ? "yb-btn-primary" : "yb-btn-gold")}>
+                <Link
+                  to={"/payment?service=" + mode + "&current=" + from + "&target=" + to}
+                  className={"yb-btn yb-btn-block " + (mode === "solo" ? "yb-btn-primary" : "yb-btn-gold")}>
                   <TrendingUp size={17} /> Rank up
-                </a>
+                </Link>
                 <div className="yb-trust">
                   <span><Zap size={11} /> Fast queue</span>
                   <span><ShieldCheck size={11} /> Progress updates</span>

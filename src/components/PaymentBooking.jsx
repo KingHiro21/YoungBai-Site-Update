@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Copy, Check, MessageSquare, Phone, CalendarClock, Wallet } from "lucide-react";
 import {
   SITE_CONFIG, PAYMENT_ACCOUNTS, BOOKING_SLOTS, BOOKING_WHATSAPP,
@@ -33,10 +34,13 @@ function CopyBtn({ text, label }) {
   );
 }
 
-export default function PaymentBooking() {
-  const [service, setService] = useState("Solo Boost");
-  const [current, setCurrent] = useState("");
-  const [target, setTarget] = useState("");
+export default function PaymentBooking({ standalone = false }) {
+  const [params] = useSearchParams();
+  const fromCfg = (k, fb) => params.get(k) || fb;
+  const [service, setService] = useState(
+    fromCfg("service", "solo") === "party" ? "Party Boost" : "Solo Boost");
+  const [current, setCurrent] = useState(fromCfg("current", ""));
+  const [target, setTarget] = useState(fromCfg("target", ""));
   const [ign, setIgn] = useState("");
   const [date, setDate] = useState("");
   const [slot, setSlot] = useState("");
@@ -75,11 +79,13 @@ export default function PaymentBooking() {
   return (
     <section className="yb-sec" id="payment">
       <div className="yb-wrap yb-content">
-        <SectionHead
-          eyebrow="Pay, then lock your slot"
-          title="Payment & booking"
-          lead="Send payment to any account below, then book your schedule with the reference code. Your slot is confirmed once Youngbai verifies the receipt — usually within the hour."
-        />
+        {!standalone && (
+          <SectionHead
+            eyebrow="Pay, then lock your slot"
+            title="Payment & booking"
+            lead="Send payment to any account below, then book your schedule with the reference code. Your slot is confirmed once Youngbai verifies the receipt — usually within the hour."
+          />
+        )}
 
         <div className="yb-payflow">
           {/* ── left: payment accounts ── */}
