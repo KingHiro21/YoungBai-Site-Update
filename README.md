@@ -25,6 +25,8 @@ Push this repo to GitHub, import it in Vercel — it auto-detects Vite.
 | Rank medals + MMR thresholds | `RANKS` (see below) |
 | Service tabs (incl. "Soon" ones) | `SERVICE_TABS` |
 | Stats, testimonials, FAQ, leaderboard | `COMMUNITY_STATS`, `TESTIMONIALS`, `FAQ_ITEMS`, `LEADERBOARD` |
+| Payment accounts (GCash/Maya/GoTyme) | `PAYMENT_ACCOUNTS` (QR images → `public/payments/`) |
+| Booking time slots + WhatsApp number | `BOOKING_SLOTS`, `BOOKING_WHATSAPP` |
 
 The calculator reads `SOLO_PRICING` / `PARTY_PRICING` directly —
 update a price once and the tables, cards, and estimates all follow.
@@ -39,6 +41,14 @@ Drop your 8 medal PNGs into `public/ranks/` and set the paths in
 
 While `img` is empty (or a file is missing) tiles show a colored gem
 fallback — the site never shows a broken image.
+
+## Pages
+- `/` — the full landing page
+- `/payment` — Payment & Booking (lazy-loaded; the configurator's
+  "Rank up" button links here with the order pre-filled via URL params)
+
+`vercel.json` contains the SPA rewrite so `/payment` works on refresh
+and direct links. Don't delete it.
 
 ## Structure
 ```
