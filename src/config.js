@@ -150,9 +150,9 @@ export const WHY_CARDS = [
 ];
 
 export const HOW_IT_WORKS = [
-  { step: "01", kicker: "Pick a lane", title: "CHOOSE YOUR BOOST", body: "Pick Solo or Party boosting based on how you want to climb." },
-  { step: "02", kicker: "Say hello", title: "CONTACT YOUNGBAI", body: "Message Youngbai through Discord or the order channel." },
-  { step: "03", kicker: "Lock it in", title: "START YOUR BOOST", body: "Share the details needed and the games begin." },
+  { step: "01", kicker: "Pick a lane", title: "CONFIGURE YOUR BOOST", body: "Choose Solo or Party and set your current and target MMR." },
+  { step: "02", kicker: "Lock it in", title: "PAY & BOOK A SLOT", body: "Send payment to GCash, Maya, or GoTyme and pick your schedule with your order reference." },
+  { step: "03", kicker: "Quick check", title: "RECEIPT VERIFIED", body: "Youngbai verifies your receipt and confirms the slot — usually within the hour." },
   { step: "04", kicker: "Watch it rise", title: "CLIMB THE RANKS", body: "Track progress until you hit your target MMR." },
 ];
 
@@ -200,7 +200,9 @@ export const FAQ_ITEMS = [
   { q: "What is Party Boosting?", a: "You queue and play together with the booster. You stay in control of your own account and get to learn from the games while you climb." },
   { q: "How does Party Boosting pricing work?", a: "Party boosting is charged per win. You only pay for games that are won, at the rate for your current MMR bracket." },
   { q: "How does Solo Boosting pricing work?", a: "Solo boosting is priced per 100 MMR. The rate depends on your current bracket — higher MMR takes more games and more skill, so the rate rises." },
-  { q: "How do I place an order?", a: "Join the Discord and post in the boosting channel, or message Youngbai directly. Tell us your current MMR, your target, and whether you want Solo or Party." },
+  { q: "How do I place an order?", a: "Configure your boost on the home page, then head to the Payment page: send payment to GCash, Maya, or GoTyme, pick your schedule, and send the booking with your order reference via WhatsApp or Discord." },
+  { q: "How do I pay?", a: "GCash, Maya, or GoTyme Bank transfer — the account details and copy buttons are on the Payment page. Include your order reference in the transfer note if your app allows it, and keep the receipt screenshot." },
+  { q: "Is my booking confirmed automatically?", a: "No — your slot is pending until Youngbai verifies the payment receipt and replies to confirm, usually within the hour. This protects both sides." },
   { q: "How do I join the Discord?", a: "Use any Join Discord button on this page. The invite is open and free — you don't need to buy a boost to be part of the community." },
   { q: "Can I play with the booster?", a: "Yes — that's exactly what Party Boosting is for. You queue as a party and climb together." },
   { q: "How long does boosting take?", a: "It depends on your bracket and how much MMR you want. You get an estimate before starting, and updates while it runs." },
@@ -215,7 +217,7 @@ export const NAV_LINKS = [
   { label: "Party Boost", href: "#party" },
   { label: "Community", href: "#community" },
   { label: "Tournaments", href: "#tournaments" },
-  { label: "Payment", href: "#payment" },
+  { label: "Payment", href: "/payment" },
   { label: "FAQ", href: "#faq" },
   { label: "Contact", href: "#contact" },
 ];

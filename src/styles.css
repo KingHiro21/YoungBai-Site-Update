@@ -644,6 +644,25 @@
 .yb-btn.is-disabled { opacity:.45; cursor:not-allowed; }
 .yb-btn.is-disabled:hover { transform:none; box-shadow:none; }
 
+/* ── payment page + a11y ──────────────────────────── */
+.yb-pagehero { position:relative; overflow:hidden; padding:150px 0 64px;
+  background:
+    radial-gradient(110% 90% at 50% 115%, rgba(196,18,48,.28) 0%, transparent 62%),
+    linear-gradient(180deg,#0a090d 0%,#100c12 60%,#08070a 100%);
+  border-bottom:1px solid var(--line); }
+.yb-pagehero h1 { font-size:clamp(2.4rem,7vw,4.6rem); margin:18px 0 14px; }
+.yb-back { display:inline-flex; align-items:center; gap:8px; font-family:var(--mono);
+  font-size:.66rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ash);
+  transition:color .2s ease; }
+.yb-back:hover { color:var(--gold); }
+.yb-skip { position:fixed; top:-60px; left:16px; z-index:100; background:var(--crimson);
+  color:#fff; padding:10px 18px; font-family:var(--cond); font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase; transition:top .2s ease; }
+.yb-skip:focus { top:12px; }
+.yb-pageload { min-height:50vh; display:grid; place-items:center;
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.3em;
+  text-transform:uppercase; color:var(--ash-dim); }
+
 /* ── responsive ───────────────────────────────────── */
 @media (max-width:1080px) {
   .yb-navlinks { display:none; }
