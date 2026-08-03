@@ -245,7 +245,7 @@ export default function ClimbCalculator() {
                   </div>
                 </div>
 
-                <a href={SITE_CONFIG.socialLinks.discord} target="_blank" rel="noreferrer noopener"
+                <a href="#payment"
                    className={"yb-btn yb-btn-block " + (mode === "solo" ? "yb-btn-primary" : "yb-btn-gold")}>
                   <TrendingUp size={17} /> Rank up
                 </a>
