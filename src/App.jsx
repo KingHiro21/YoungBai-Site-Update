@@ -6,6 +6,7 @@ import Configurator from "./components/Configurator.jsx";
 import SoloPricing from "./components/SoloPricing.jsx";
 import PartyPricing from "./components/PartyPricing.jsx";
 import BoostComparison from "./components/BoostComparison.jsx";
+import PaymentBooking from "./components/PaymentBooking.jsx";
 import HowItWorks from "./components/HowItWorks.jsx";
 import WhyYoungbai from "./components/WhyYoungbai.jsx";
 import DiscordCommunity from "./components/DiscordCommunity.jsx";
@@ -27,6 +28,7 @@ export default function App() {
         <Configurator />
         <SoloPricing />
         <PartyPricing />
+        <PaymentBooking />
         <BoostComparison />
         <HowItWorks />
         <WhyYoungbai />

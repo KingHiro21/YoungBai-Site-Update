@@ -82,6 +82,26 @@ export const SERVICE_TABS = [
   { id: "coaching", label: "Coaching", icon: "graduation", soon: true },
 ];
 
+/* Payment accounts shown in the Payment & Booking section.
+   qr: drop QR images into public/payments/ (e.g. "/payments/gcash.png").
+   While empty, the card shows account details only. */
+export const PAYMENT_ACCOUNTS = [
+  { id: "gcash", name: "GCash", accountName: "Ayr Shanley Baltonado",
+    number: "0912 290 0598", qr: "", color: "#3a7bd5" },
+  { id: "maya", name: "Maya", accountName: "Ayr Shanley Baltonado",
+    number: "0912 290 0598", qr: "", color: "#4caf7d" },
+  { id: "gotyme", name: "GoTyme Bank", accountName: "Ayr Shanley Baltonado",
+    number: "0189 4824 5001", qr: "", color: "#d9a94c" },
+];
+
+/* Time slots offered in the booking widget (your local time). */
+export const BOOKING_SLOTS = [
+  "10:00 AM", "1:00 PM", "4:00 PM", "7:00 PM", "9:00 PM", "11:00 PM",
+];
+
+/* WhatsApp number bookings are sent to, international format, digits only. */
+export const BOOKING_WHATSAPP = "639122900598";
+
 /* Social channels. Icon keys: facebook, instagram, tiktok, whatsapp,
    wechat, discord. Entries with an href render as links; entries with
    only "info" (like WeChat, which has no public profile URL) render as
@@ -195,6 +215,7 @@ export const NAV_LINKS = [
   { label: "Party Boost", href: "#party" },
   { label: "Community", href: "#community" },
   { label: "Tournaments", href: "#tournaments" },
+  { label: "Payment", href: "#payment" },
   { label: "FAQ", href: "#faq" },
   { label: "Contact", href: "#contact" },
 ];
