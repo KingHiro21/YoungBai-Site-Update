@@ -187,7 +187,10 @@ export default function PaymentBooking({ standalone = false }) {
     } catch {
       window.prompt("Copy your order message:", message);
     }
-    window.open(SITE_CONFIG.socialLinks.discord, "_blank", "noopener");
+    window.open(
+      SITE_CONFIG.receiptDiscord || SITE_CONFIG.socialLinks.discord,
+      "_blank", "noopener"
+    );
   };
 
   async function submitBooking() {

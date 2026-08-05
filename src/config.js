@@ -20,6 +20,10 @@ export const SITE_CONFIG = {
   socialLinks: {
     discord: "https://discord.gg/DAxj8y77HP",
   },
+  /* Where the "Send receipt via Discord" button sends people. Leave as-is to
+     reuse the main invite, or paste an invite generated from a specific
+     channel (e.g. your #create-ticket channel) to land them there instead. */
+  receiptDiscord: "https://discord.gg/DAxj8y77HP",
   currency: "₱",
   mmrPerWin: 25, // used for the approx. per-win estimates + calculator
 };
