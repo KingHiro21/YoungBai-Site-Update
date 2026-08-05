@@ -663,6 +663,43 @@
   font-family:var(--mono); font-size:.7rem; letter-spacing:.3em;
   text-transform:uppercase; color:var(--ash-dim); }
 
+.yb-book-done { margin-top:22px; border:1px solid rgba(76,175,125,.35);
+  background:rgba(76,175,125,.06); padding:20px; }
+.yb-book-done-head { display:flex; align-items:center; gap:12px; margin-bottom:12px;
+  color:#7fd6a0; }
+.yb-book-done-head b { display:block; font-family:var(--display); font-size:1.15rem;
+  letter-spacing:.05em; text-transform:uppercase; color:var(--bone); }
+.yb-book-done-head span { font-size:.78rem; color:var(--gold); }
+.yb-book-done p { font-size:.9rem; color:var(--ash); margin-bottom:16px; }
+.yb-book-fallback { margin-top:14px; border:1px solid var(--line-hot);
+  background:rgba(196,18,48,.05); padding:16px; }
+.yb-book-fallback p { font-size:.86rem; color:var(--ash); margin-bottom:12px; }
+
+.yb-inline-warn { font-size:.82rem; color:#ff8a95; margin-top:14px;
+  padding:10px 14px; border:1px solid var(--line-hot);
+  background:rgba(196,18,48,.07); }
+.yb-linkbtn { display:block; margin:14px auto 0; font-family:var(--mono);
+  font-size:.62rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--ash-dim); text-decoration:underline; transition:color .2s ease; }
+.yb-linkbtn:hover { color:var(--gold); }
+
+.yb-payamount { display:flex; align-items:flex-end; justify-content:space-between;
+  gap:14px; margin-top:20px; padding:16px 18px; border:1px solid var(--gold-dim);
+  background:rgba(217,169,76,.05); }
+.yb-payamount b { display:block; font-family:var(--display); font-size:1.7rem;
+  line-height:1.1; margin-top:4px;
+  background:linear-gradient(96deg,var(--bone),var(--gold));
+  -webkit-background-clip:text; background-clip:text; color:transparent; }
+.yb-payamount-meta { font-family:var(--mono); font-size:.64rem;
+  color:var(--ash-dim); text-align:right; line-height:1.8; }
+.yb-payacct-single { margin-top:16px; }
+.yb-paynum { font-size:1.25rem; letter-spacing:.04em; }
+.yb-payref { display:flex; gap:10px; align-items:flex-start; margin-top:14px;
+  padding:12px 14px; border:1px dashed var(--gold-dim);
+  background:rgba(217,169,76,.04); font-size:.84rem; color:var(--ash); }
+.yb-payref svg { flex:none; color:var(--gold); margin-top:2px; }
+.yb-payref b { color:var(--gold); }
+
 /* ── responsive ───────────────────────────────────── */
 @media (max-width:1080px) {
   .yb-navlinks { display:none; }
