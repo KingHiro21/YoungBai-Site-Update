@@ -50,6 +50,40 @@ fallback — the site never shows a broken image.
 `vercel.json` contains the SPA rewrite so `/payment` works on refresh
 and direct links. Don't delete it.
 
+## Booking backend (`/api/book`)
+The Payment page's **Confirm booking** button POSTs to a Vercel serverless
+function that delivers the order to whichever of these you configure in
+**Vercel → Project → Settings → Environment Variables**:
+
+| Env var | What it does |
+|---|---|
+| `DISCORD_WEBHOOK_URL` | Posts the order as an embed to a channel. Server Settings → Integrations → Webhooks → New Webhook (pick a private `#orders` channel) → Copy URL |
+| `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | Optional: also sends to Telegram |
+| `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` | Optional: also inserts into a `bookings` table — run `supabase/bookings.sql` in the Supabase SQL editor first |
+
+Set at least one, then **redeploy**. Until one is set, the form shows the
+error fallback (WhatsApp/Discord manual send) — nothing breaks.
+
+Built-in protection: honeypot field, 5 bookings/min/IP soft rate limit,
+strict ref-code validation, capped field lengths.
+
+To confirm an order: check the ref against the receipt the customer sends,
+then (if using Supabase) flip its `status` from `pending` to `confirmed`.
+
+**Check your setup:** visit `/api/health` on your deployed site. It returns
+which channels are configured (true/false only — never the values):
+```json
+{ "ok": true, "configured": { "discord": true, "telegram": false, "supabase": false } }
+```
+`"discord": false` means the env var didn't reach the build — check the key
+spelling and redeploy.
+
+Delivery failures are logged to **Vercel → your project → Logs** with the
+order ref and reason, e.g. `[book] discord delivery failed for YB-K3F7M2: http_404`.
+
+**Local testing:** `npx vercel dev` (the plain `npm run dev` doesn't run
+`/api` functions — the form will show the fallback locally, that's normal).
+
 ## Structure
 ```
 src/
