@@ -3,10 +3,16 @@
 export default function handler(req, res) {
   const configured = {
     discord: Boolean(process.env.DISCORD_WEBHOOK_URL),
+    discord_proof: Boolean(process.env.DISCORD_PROOF_WEBHOOK_URL),
     telegram: Boolean(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID),
     supabase: Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY),
   };
-  const ready = Object.values(configured).some(Boolean);
+  // The proof channel alone isn't enough — staff still need the full order.
+  const ready = Boolean(
+    process.env.DISCORD_WEBHOOK_URL ||
+    (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) ||
+    (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
+  );
   res.setHeader("Cache-Control", "no-store");
   return res.status(ready ? 200 : 503).json({
     ok: ready,

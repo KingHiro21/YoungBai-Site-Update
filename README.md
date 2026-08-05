@@ -57,7 +57,9 @@ function that delivers the order to whichever of these you configure in
 
 | Env var | What it does |
 |---|---|
-| `DISCORD_WEBHOOK_URL` | Posts the order as an embed to a channel. Server Settings → Integrations → Webhooks → New Webhook (pick a private `#orders` channel) → Copy URL |
+| `DISCORD_WEBHOOK_URL` | **Private staff channel.** Full order + receipt image. Right-click a PRIVATE channel → Edit Channel → Integrations → Webhooks → New Webhook → Copy URL |
+| `DISCORD_PROOF_WEBHOOK_URL` | Optional. **Public proof-of-payments channel.** Posts ref, service, climb, amount and the receipt image. Never the IGN or contact details. |
+| `PROOF_RECEIPT` | Optional. Set to `off` to keep receipt images out of the public channel (numbers only). The private channel always gets the image. |
 | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | Optional: also sends to Telegram |
 | `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` | Optional: also inserts into a `bookings` table — run `supabase/bookings.sql` in the Supabase SQL editor first |
 

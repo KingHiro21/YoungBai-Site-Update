@@ -2,9 +2,11 @@ import React, { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   Copy, Check, MessageSquare, Phone, Wallet, CalendarClock, ReceiptText,
+  Upload, X,
 } from "lucide-react";
 import {
   SITE_CONFIG, PAYMENT_ACCOUNTS, BOOKING_SLOTS, BOOKING_WHATSAPP, peso,
+  RECEIPT_NOTICE,
 } from "../config.js";
 import { Reveal, SectionHead } from "../shared.jsx";
 import { quote } from "../lib.js";
@@ -28,7 +30,33 @@ const ERROR_TEXT = {
   not_configured: "Bookings aren't connected yet. Send your order directly instead:",
   delivery_failed: "Couldn't reach the booking system — send your order directly instead:",
   network: "Connection problem — send your order directly instead:",
+  receipt_too_large: "That receipt image is too large — try a screenshot instead of a photo.",
+  bad_receipt_type: "Receipts must be an image (JPG, PNG, or WebP).",
+  bad_receipt: "Couldn't read that image — please try another.",
 };
+
+/* Shrink screenshots in the browser so uploads stay small and fast. */
+async function shrinkImage(file, maxDim = 1600, quality = 0.82) {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+  const w = Math.round(bitmap.width * scale);
+  const h = Math.round(bitmap.height * scale);
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  canvas.getContext("2d").drawImage(bitmap, 0, 0, w, h);
+  bitmap.close?.();
+  return new Promise((resolve) =>
+    canvas.toBlob((b) => resolve(b), "image/jpeg", quality));
+}
+
+const blobToBase64 = (blob) =>
+  new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(",")[1]);
+    r.onerror = reject;
+    r.readAsDataURL(blob);
+  });
 const CHAT_FALLBACK = ["not_configured", "delivery_failed", "network"];
 
 function CopyBtn({ text, label }) {
@@ -83,7 +111,46 @@ export default function PaymentBooking({ standalone = false }) {
   const [hp, setHp] = useState(""); // honeypot — humans never see the field
   const [copiedMsg, setCopiedMsg] = useState(false);
   const [refSeed, setRefSeed] = useState(0);
+  const [receipt, setReceipt] = useState(null); // { base64, type, preview, kb }
+  const [rcptBusy, setRcptBusy] = useState(false);
   const orderRef = useMemo(makeRef, [refSeed]);
+
+  async function pickReceipt(file) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setErrCode("bad_receipt_type");
+      setStatus("error");
+      return;
+    }
+    setRcptBusy(true);
+    try {
+      let blob = file;
+      try {
+        const small = await shrinkImage(file);
+        if (small && small.size < file.size) blob = small;
+      } catch { /* fall back to the original file */ }
+      const base64 = await blobToBase64(blob);
+      setReceipt({
+        base64,
+        type: blob.type || file.type,
+        preview: URL.createObjectURL(blob),
+        kb: Math.round(blob.size / 1024),
+      });
+      if (errCode.startsWith("bad_receipt") || errCode === "receipt_too_large") {
+        setErrCode(""); setStatus("idle");
+      }
+    } catch {
+      setErrCode("bad_receipt");
+      setStatus("error");
+    } finally {
+      setRcptBusy(false);
+    }
+  }
+
+  function clearReceipt() {
+    if (receipt?.preview) URL.revokeObjectURL(receipt.preview);
+    setReceipt(null);
+  }
 
   const serviceLabel = mode === "party" ? "Party Boost" : "Solo Boost";
   const account = PAYMENT_ACCOUNTS.find((p) => p.id === payWith) || PAYMENT_ACCOUNTS[0];
@@ -136,6 +203,7 @@ export default function PaymentBooking({ standalone = false }) {
           ref: orderRef, service: serviceLabel, ign: ign.trim(),
           current, target, amount: est ? String(est.total) : "",
           date, slot, payWith: account?.name || payWith, website: hp,
+          receipt: receipt ? { data: receipt.base64, type: receipt.type } : null,
         }),
       });
       const d = await r.json().catch(() => ({}));
@@ -148,6 +216,7 @@ export default function PaymentBooking({ standalone = false }) {
   }
 
   function bookAnother() {
+    clearReceipt();
     setRefSeed((n) => n + 1);
     setStatus("idle");
     setErrCode("");
@@ -291,6 +360,34 @@ export default function PaymentBooking({ standalone = false }) {
                   </button>
                 ))}
               </div>
+
+              <div className="yb-order-lbl">Payment receipt</div>
+              {!receipt ? (
+                <label className={"yb-drop " + (rcptBusy ? "is-busy" : "")}>
+                  <input type="file" accept="image/*" hidden disabled={rcptBusy}
+                         onChange={(e) => pickReceipt(e.target.files?.[0])} />
+                  <Upload size={18} />
+                  <span>
+                    <b>{rcptBusy ? "Preparing image…" : "Attach your receipt screenshot"}</b>
+                    <i>Sent straight to Youngbai with your booking — optional but faster</i>
+                  </span>
+                </label>
+              ) : (
+                <div className="yb-rcpt">
+                  <img src={receipt.preview} alt="Your payment receipt" />
+                  <div className="yb-rcpt-meta">
+                    <b>Receipt attached</b>
+                    <span>{receipt.kb} KB · sent with your booking</span>
+                  </div>
+                  <button type="button" className="yb-rcpt-x" onClick={clearReceipt}
+                          aria-label="Remove receipt">
+                    <X size={15} />
+                  </button>
+                </div>
+              )}
+              {RECEIPT_NOTICE && (
+                <p className="yb-rcpt-notice">{RECEIPT_NOTICE}</p>
+              )}
             </div>
           </div>
 
@@ -320,6 +417,10 @@ export default function PaymentBooking({ standalone = false }) {
                   <div><span>Schedule</span>
                     <span>{date && slot ? date + " · " + slot : "—"}</span></div>
                   <div><span>IGN</span><span>{ign.trim() || "—"}</span></div>
+                  <div><span>Receipt</span>
+                    <span style={{ color: receipt ? "#7fd6a0" : "var(--ash-dim)" }}>
+                      {receipt ? "Attached" : "Not attached"}
+                    </span></div>
                   <div><span>Status</span>
                     <span style={{ color: status === "done" ? "#7fd6a0" : "var(--gold)" }}>
                       {status === "done" ? "Pending verification" : "Draft"}
@@ -393,15 +494,17 @@ export default function PaymentBooking({ standalone = false }) {
                     <div className="yb-book-done-head">
                       <Check size={20} strokeWidth={2.5} />
                       <div>
-                        <b>Order sent to Youngbai</b>
+                        <b>{receipt ? "Order + receipt sent" : "Order sent to Youngbai"}</b>
                         <span className="yb-num">Ref {orderRef}</span>
                       </div>
                     </div>
                     <p>
-                      Last step — send your <b>payment receipt screenshot</b> with the
-                      reference code so the slot can be confirmed:
+                      {receipt
+                        ? "Youngbai has your booking and your receipt. You'll get a confirmation once it's verified — usually within the hour. Nothing else to do."
+                        : "Last step — send your payment receipt screenshot with the reference code so the slot can be confirmed:"}
                     </p>
-                    <div className="yb-book-ctas">
+                    <div className="yb-book-ctas"
+                         style={{ display: receipt ? "none" : "grid" }}>
                       <a className="yb-btn yb-btn-primary yb-btn-block" href={waHref}
                          target="_blank" rel="noreferrer noopener">
                         <Phone size={16} /> Send receipt via WhatsApp

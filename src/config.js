@@ -18,7 +18,7 @@ export const SITE_CONFIG = {
       "Youngbai provides Dota 2 Solo and Party MMR boosting, plus tournaments, giveaways, prizes and a gaming community on Discord.",
   },
   socialLinks: {
-    discord: "https://discord.gg/thaDTdX9mT",
+    discord: "https://discord.gg/DAxj8y77HP",
   },
   currency: "₱",
   mmrPerWin: 25, // used for the approx. per-win estimates + calculator
@@ -82,6 +82,11 @@ export const SERVICE_TABS = [
   { id: "coaching", label: "Coaching", icon: "graduation", soon: true },
 ];
 
+/* Shown on the receipt upload control. Set to "" to hide the notice.
+   Keep this accurate: if receipts are posted publicly, say so here. */
+export const RECEIPT_NOTICE =
+  "Receipts may be posted in our public #proof-of-payments channel. Cover any details you'd rather not share.";
+
 /* Payment accounts shown in the Payment & Booking section.
    qr: drop QR images into public/payments/ (e.g. "/payments/gcash.png").
    While empty, the card shows account details only. */
@@ -120,7 +125,7 @@ export const SOCIALS = [
   { id: "wechat", label: "WeChat", icon: "wechat",
     info: "Youngbai · 0912 290 0598" },
   { id: "discord", label: "Discord", icon: "discord",
-    href: "https://discord.gg/thaDTdX9mT" },
+    href: "https://discord.gg/DAxj8y77HP" },
 ];
 
 export const rankForMmr = (mmr) =>

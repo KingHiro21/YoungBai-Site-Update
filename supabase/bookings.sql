@@ -10,6 +10,7 @@ create table if not exists public.bookings (
   slot        text,
   pay_with    text,
   amount      integer,
+  has_receipt boolean not null default false,
   status      text not null default 'pending',  -- pending → confirmed / rejected
   created_at  timestamptz not null default now()
 );
@@ -20,3 +21,4 @@ alter table public.bookings enable row level security;
 
 -- If you already created the table before the amount column existed:
 -- alter table public.bookings add column if not exists amount integer;
+-- alter table public.bookings add column if not exists has_receipt boolean not null default false;

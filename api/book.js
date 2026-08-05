@@ -1,6 +1,10 @@
 /* /api/book — receives bookings from the Payment page.
    Delivers to any of the following that are configured (Vercel env vars):
-     DISCORD_WEBHOOK_URL            → posts an embed to your #orders channel
+     DISCORD_WEBHOOK_URL            → PRIVATE staff channel: full order + receipt image
+     DISCORD_PROOF_WEBHOOK_URL      → PUBLIC proof channel: ref, service, climb, amount
+                                      and the receipt image. Never the IGN or contact info.
+     PROOF_RECEIPT=off              → optional: keep the receipt image out of the
+                                      public channel (private channel still gets it)
      TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID → sends a Telegram message
      SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY → inserts into `bookings` table
    At least one must be set or the endpoint returns not_configured. */
@@ -74,6 +78,27 @@ export default async function handler(req, res) {
   if (nCur !== null && nTgt !== null && nTgt <= nCur) {
     return res.status(400).json({ ok: false, error: "target_below_current" });
   }
+  /* Optional receipt image, sent as base64 from the browser. */
+  const rcpt = b.receipt && typeof b.receipt === "object" ? b.receipt : null;
+  let receiptBuf = null;
+  let receiptName = "receipt.jpg";
+  if (rcpt && rcpt.data) {
+    const type = clean(rcpt.type, 40);
+    if (!["image/jpeg", "image/png", "image/webp"].includes(type)) {
+      return res.status(400).json({ ok: false, error: "bad_receipt_type" });
+    }
+    try {
+      receiptBuf = Buffer.from(String(rcpt.data), "base64");
+    } catch {
+      return res.status(400).json({ ok: false, error: "bad_receipt" });
+    }
+    if (!receiptBuf.length || receiptBuf.length > 4 * 1024 * 1024) {
+      return res.status(400).json({ ok: false, error: "receipt_too_large" });
+    }
+    const ext = type === "image/png" ? "png" : type === "image/webp" ? "webp" : "jpg";
+    receiptName = ref + "-receipt." + ext;
+  }
+
   const nAmt = amount ? Number(amount) : null;
   if (nAmt !== null && (!Number.isFinite(nAmt) || nAmt < 0 || nAmt > 1_000_000)) {
     return res.status(400).json({ ok: false, error: "bad_amount" });
@@ -83,7 +108,8 @@ export default async function handler(req, res) {
   const summary =
     `Ref: ${ref}\nService: ${service}\nClimb: ${climb}\n` +
     `Est. amount: ${nAmt !== null ? "₱" + nAmt.toLocaleString() : "—"}\n` +
-    `Schedule: ${date} · ${slot}\nIGN: ${ign}\nPaying via: ${payWith}`;
+    `Schedule: ${date} · ${slot}\nIGN: ${ign}\nPaying via: ${payWith}\n` +
+    `Receipt: ${receiptBuf ? "attached" : "not attached"}`;
 
   /* Never let a hanging webhook stall the request. */
   const withTimeout = (p, ms = 8000) => {
@@ -97,28 +123,93 @@ export default async function handler(req, res) {
 
   if (process.env.DISCORD_WEBHOOK_URL) {
     channels.push("discord");
+    const embed = {
+      title: (receiptBuf ? "🧾 New booking + receipt — " : "🛒 New boost booking — ") + ref,
+      color: receiptBuf ? 0x4caf7d : 0xc41230,
+      fields: [
+        { name: "Service", value: service || "—", inline: true },
+        { name: "Climb", value: climb, inline: true },
+        { name: "Schedule", value: `${date} · ${slot}`, inline: true },
+        { name: "IGN", value: ign, inline: true },
+        { name: "Paying via", value: payWith || "—", inline: true },
+        { name: "Est. amount", value: nAmt !== null ? "₱" + nAmt.toLocaleString() : "—", inline: true },
+        {
+          name: "Status",
+          value: receiptBuf
+            ? "🧾 Receipt attached — verify and confirm"
+            : "⏳ Awaiting receipt from customer",
+        },
+      ],
+      timestamp: new Date().toISOString(),
+    };
+
     tasks.push(
-      withTimeout((signal) => fetch(process.env.DISCORD_WEBHOOK_URL, {
-        method: "POST",
-        signal,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          embeds: [{
-            title: "🛒 New boost booking — " + ref,
-            color: 0xc41230,
-            fields: [
-              { name: "Service", value: service || "—", inline: true },
-              { name: "Climb", value: climb, inline: true },
-              { name: "Schedule", value: `${date} · ${slot}`, inline: true },
-              { name: "IGN", value: ign, inline: true },
-              { name: "Paying via", value: payWith || "—", inline: true },
-              { name: "Est. amount", value: nAmt !== null ? "₱" + nAmt.toLocaleString() : "—", inline: true },
-              { name: "Status", value: "⏳ Pending receipt", inline: true },
-            ],
-            timestamp: new Date().toISOString(),
-          }],
-        }),
-      }))
+      withTimeout((signal) => {
+        if (receiptBuf) {
+          // Attach the image so it renders inline in the channel.
+          embed.image = { url: "attachment://" + receiptName };
+          const form = new FormData();
+          form.append("payload_json", JSON.stringify({ embeds: [embed] }));
+          form.append(
+            "files[0]",
+            new Blob([receiptBuf], { type: clean(rcpt.type, 40) }),
+            receiptName
+          );
+          return fetch(process.env.DISCORD_WEBHOOK_URL, {
+            method: "POST", signal, body: form,
+          });
+        }
+        return fetch(process.env.DISCORD_WEBHOOK_URL, {
+          method: "POST",
+          signal,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ embeds: [embed] }),
+        });
+      }, 15000)
+    );
+  }
+
+  /* Public "proof of payments" post. Carries the receipt image (that's the
+     point of the channel) but never the IGN or any contact details.
+     Set PROOF_RECEIPT=off to publish the numbers without the image. */
+  if (process.env.DISCORD_PROOF_WEBHOOK_URL) {
+    channels.push("discord_proof");
+    const showReceipt = receiptBuf && process.env.PROOF_RECEIPT !== "off";
+    const proofEmbed = {
+      title: "✅ Payment received — " + ref,
+      description: "Another climb is underway. 🔥",
+      color: 0x4caf7d,
+      fields: [
+        { name: "Service", value: service || "—", inline: true },
+        { name: "Climb", value: climb, inline: true },
+        { name: "Amount", value: nAmt !== null ? "₱" + nAmt.toLocaleString() : "—", inline: true },
+      ],
+      footer: { text: "Youngbai · verified bookings" },
+      timestamp: new Date().toISOString(),
+    };
+
+    tasks.push(
+      withTimeout((signal) => {
+        if (showReceipt) {
+          proofEmbed.image = { url: "attachment://" + receiptName };
+          const form = new FormData();
+          form.append("payload_json", JSON.stringify({ embeds: [proofEmbed] }));
+          form.append(
+            "files[0]",
+            new Blob([receiptBuf], { type: clean(rcpt.type, 40) }),
+            receiptName
+          );
+          return fetch(process.env.DISCORD_PROOF_WEBHOOK_URL, {
+            method: "POST", signal, body: form,
+          });
+        }
+        return fetch(process.env.DISCORD_PROOF_WEBHOOK_URL, {
+          method: "POST",
+          signal,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ embeds: [proofEmbed] }),
+        });
+      }, 15000)
     );
   }
 
@@ -155,6 +246,7 @@ export default async function handler(req, res) {
           target_mmr: nTgt,
           date, slot, pay_with: payWith,
           amount: nAmt,
+          has_receipt: Boolean(receiptBuf),
           status: "pending",
         }),
       }))
@@ -183,5 +275,7 @@ export default async function handler(req, res) {
   if (ok.length === 0) {
     return res.status(502).json({ ok: false, error: "delivery_failed" });
   }
-  return res.status(200).json({ ok: true, ref, delivered: ok, failed });
+  return res.status(200).json({
+    ok: true, ref, delivered: ok, failed, receipt: Boolean(receiptBuf),
+  });
 }
